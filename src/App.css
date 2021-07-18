@@ -17,3 +17,6 @@ a{
   text-decoration: none;
   color: steelblue;
 }
+.nav-container svg{
+  color: aliceblue;
+}

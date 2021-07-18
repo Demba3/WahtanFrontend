@@ -15,9 +15,16 @@ import TextField from "@material-ui/core/TextField";
 import Typography from "@material-ui/core/Typography";
 import Grid from "@material-ui/core/Grid";
 
+
+//redux stuff
+import { connect } from "react-redux";
+import { signup } from "../redux/actions/userActions";
+
+
+
 const useStyles = makeStyles(() => ({ ...themeObject }));
 
-const Signup = () => {
+const Signup = ({signUp, UI: { loading, error }}) => {
   const classes = useStyles();
   // console.log(classes);
   const [handle, setHandle] = useState("");
@@ -27,29 +34,22 @@ const Signup = () => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [userData, setUserData] = useState({});
 
-  const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true);
     setUserData({
       email,
       password,
       confirmPassword,
-      handle
+      handle,
     });
-    try {
-      //console.log("tried")
-      const res = await axios.post("/signup", userData);
-      setLoading(false);
-      localStorage.setItem("FBIdToken", `Bearer ${res.data.token}`);
-      history.push("/");
-    } catch (err) {
-      setErrors(err.response.data);
-      setLoading(false);
-      console.log(errors);
-    }
+    console.log(error)
+    signUp(userData, history);
+    console.log(error)
+    if(error !== null && Object.keys(error).length !== 0){
+      setErrors(error);
+      }
   };
 
   return (
@@ -131,9 +131,11 @@ const Signup = () => {
           <Button
             varient="contained"
             type="submit"
+            value="Submit"
             color="primary"
             className={classes.button}
             disabled={loading}
+            //onClick={() => {handleSubmit()}}
           >
             {loading && <CircularProgress className={classes.progress} />}
             Signup
@@ -149,4 +151,16 @@ const Signup = () => {
   );
 };
 
-export default Signup;
+function mapStateToProps(state){
+  return {
+    user: state.user,
+    UI: state.UI
+  }
+}
+function mapDispatchToProps(dispatch){
+  return{
+    signUp : (userData, history) => dispatch(signup(userData, history)),
+  }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(Signup);

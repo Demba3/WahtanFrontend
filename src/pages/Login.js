@@ -1,69 +1,51 @@
 import { useState } from "react";
-import axios from "axios";
 import { useHistory } from "react-router";
-
-import themeObject from "../util/theme";
-
 import { Link } from "react-router-dom";
 
-import PropTypes from "prop-types";
+import themeObject from "../util/theme";
 import { makeStyles } from "@material-ui/core/styles";
 import img from "../images/image.jpg";
-
 import CircularProgress from "@material-ui/core/CircularProgress";
 import Button from "@material-ui/core/Button";
 import TextField from "@material-ui/core/TextField";
 import Typography from "@material-ui/core/Typography";
 import Grid from "@material-ui/core/Grid";
-import { BackgroundColor } from "jest-matcher-utils/node_modules/chalk";
 
-const useStyles = makeStyles(() => ({ ...themeObject }));
+//redux stuff
+import { connect } from "react-redux";
+import { loginUser } from "../redux/actions/userActions";
 
-const Login = () => {
+
+const useStyles = makeStyles(() => ({...themeObject }));
+
+const Login = ({login, UI: { loading, error }}) => {
   const classes = useStyles();
-  // console.log(classes);
   const history = useHistory();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [userData, setUserData] = useState({});
 
-  const [loading, setLoading] = useState(false);
+ 
   const [errors, setErrors] = useState({});
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true);
+
     setUserData({
       email,
       password,
     });
-    // console.log("tried")
-    // axios.post("/login", userData)
-    // .then(res => {
-    //     console.log("good")
-    //     setLoading(false)
-    //     history.push("/");
-    // }).catch(err => {
-    //     console.log("bad")
-    //     //console.log(err);
-    //     setErrors(err.response.data);
-    //         setLoading(false)
-    //         console.log(errors)
-    // })
-    
+    login(userData, history);
+    //console.log("sgr",error)
+    if(error !== null && Object.keys(error).length !== 0){
+      setErrors(error);
+      }
+
   };
 
   return (
-    <Grid
-      className={classes.form}
-      container
-      // direction="row"
-      // justifyContent="center"
-      // alignItems="center"
-    >
-      <Grid item sm>
-        {/* <p>njisnvdi</p> */}
-      </Grid>
+    <Grid className={classes.form} container>
+      <Grid item sm></Grid>
       <Grid item sm>
         <img src={img} alt="icon" className={classes.image} />
         <Typography variant="h1" className={classes.pageTittle}>
@@ -111,6 +93,7 @@ const Login = () => {
             color="primary"
             className={classes.button}
             disabled={loading}
+            // onClick={() => {handleSubmit()}}
           >
             {loading && <CircularProgress className={classes.progress} />}
             Login
@@ -126,9 +109,15 @@ const Login = () => {
     </Grid>
   );
 };
-
-Login.propTypes = {
-  //classes: PropTypes.object.isRequired,
-};
-
-export default Login;
+function mapStateToProps(state){
+  return {
+    user: state.user,
+    UI: state.UI
+  }
+}
+function mapDispatchToProps(dispatch){
+  return{
+    login : (userData, history) => dispatch(loginUser(userData, history)),
+  }
+}
+export default connect(mapStateToProps, mapDispatchToProps)(Login);

@@ -1,5 +1,7 @@
 
-import React, { Component } from 'react'
+import React from 'react'
+
+import {connect} from "react-redux";
 
 import {BrowserRouter as Router, Route, Switch, Redirect} from "react-router-dom";
 
@@ -12,5 +14,8 @@ const AuthRoute = ({component: Component, authenticated, ...rest}) => {
         />
     )
 }
+function mapStateToProps(state){
+   return {authenticated: state.user.authenticated}
+}
 
-export default AuthRoute
+export default connect(mapStateToProps)(AuthRoute);
